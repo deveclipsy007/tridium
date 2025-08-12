@@ -330,75 +330,79 @@ AGNO_ENV={prod|dev}
 
 ```mermaid
 flowchart LR
-  subgraph Web[apps/web (Next.js)]
+  subgraph "apps/web (Next.js)"
     UI[UI iOS-Liquid]
   end
-  subgraph GW[Gateway (Next Route Handlers)]
-    Auth[Auth/Tenant
-Rate limit
-Idempotency]
+  subgraph "Gateway (Next Route Handlers)"
+    Auth[Auth/Tenant\nRate limit\nIdempotency]
     Events[Publish Events (Redis)]
     Connect[HTTP -> Conectores]
     SSE[SSE /agents/run]
   end
-  subgraph Workers[BullMQ Workers]
+  subgraph "BullMQ Workers"
     Ingest[Ingestão RAG]
     Recon[Conciliação Pagamento]
     Auto[Automations/NPS]
   end
-  subgraph Connectors[Conectores FastAPI]
+  subgraph "Conectores FastAPI"
     Asaas[Asaas API]
-    Ads[Ads SDKs
-Meta/Google/TikTok]
+    Ads[Ads SDKs\nMeta/Google/TikTok]
     Mail[Email/SMS]
   end
-  subgraph DB[(Supabase Postgres)]
+  subgraph "Supabase Postgres"
     RLS[RLS + Policies]
     Vectors[pgvector]
     Tables[CRM/Agents/Invoices/Events]
   end
-  subgraph Storage[Supabase Storage]
+  subgraph "Supabase Storage"
     Buckets[Buckets privados por tenant]
   end
-  subgraph Agno[Agno Service]
+  subgraph "Agno Service"
     Clio[Clio]
     Lucy[Lucy]
     Luddy[Luddy]
   end
-  UI -->|REST| GW
-  GW -->|Events| Workers
-  GW -->|HTTP| Connectors
-  Connectors --> GW
-  Workers --> DB
-  Workers --> Storage
-  GW --> DB
-  GW --> Storage
-  Workers --> Agno
-  Agno -->|/rag/search| GW
-  Agno -->|SSE| GW
-  GW --> UI
-  Connectors --> Asaas
-  Asaas -->|Webhooks| GW
+  UI -->|REST| Auth
+  Auth --> Events
+  Auth --> Connect
+  Connect --> Asaas
+  Connect --> Ads
+  Connect --> Mail
+  Events --> Ingest
+  Events --> Recon
+  Events --> Auto
+  Ingest --> Tables
+  Recon --> Tables
+  Auto --> Tables
+  Ingest --> Buckets
+  Auth --> Tables
+  Auth --> Buckets
+  Auto --> Clio
+  Auto --> Lucy
+  Auto --> Luddy
+  Clio -->|/rag/search| Auth
+  Lucy -->|/rag/search| Auth
+  Luddy -->|/rag/search| Auth
+  Clio --> Auth
+  Lucy --> Auth
+  Luddy --> Auth
+  Asaas -->|Webhooks| Auth
 ```
 
 ### 16.2 Tríade de agentes e contexto
 
 ```mermaid
 flowchart TB
-  subgraph Triade[Tríade de Agentes]
-    Clio[Clio
-Criativos/Copy/Persona]
-    Lucy[Lucy
-Tráfego/Ads/Métricas]
-    Luddy[Luddy
-SDR/Inbox/Checkout]
+  subgraph "Tríade de Agentes"
+    Clio[Clio\nCriativos/Copy/Persona]
+    Lucy[Lucy\nTráfego/Ads/Métricas]
+    Luddy[Luddy\nSDR/Inbox/Checkout]
   end
-  RAG[(RAG
-kb_spaces/docs/vectors)]
+  RAG[(RAG\nkb_spaces/docs/vectors)]
   CRM[(CRM/Leads/Deals)]
   KPIs[(KPIs/Dashboard)]
   Payments[(Asaas)]
-  Events[[Event Bus (Redis)]]
+  Events[Event Bus (Redis)]
   Clio -- consulta --> RAG
   Luddy -- consulta --> RAG
   Lucy -- consome --> KPIs
@@ -447,9 +451,9 @@ flowchart LR
   P --> C[Chunk 700-1200 + overlap]
   C --> E[Embed 1536-d]
   E --> V[(kb_vectors)]
-  V -->|>50k| IDX{Index?}
-  IDX -->|No| SRCH[Search scan]
-  IDX -->|IVFFlat/HNSW| SRCH
+  V -- ">50k" --> IDX{Index?}
+  IDX -- "No" --> SRCH[Search scan]
+  IDX -- "IVFFlat/HNSW" --> SRCH
   SRCH --> A[Agno (Clio/Luddy)]
   A --> UI[UI com fontes citadas]
 ```
