@@ -330,34 +330,34 @@ AGNO_ENV={prod|dev}
 
 ```mermaid
 flowchart LR
-  subgraph "apps/web (Next.js)"
+  subgraph Web
     UI[UI iOS-Liquid]
   end
-  subgraph "Gateway (Next Route Handlers)"
-    Auth[Auth/Tenant\nRate limit\nIdempotency]
-    Events[Publish Events (Redis)]
-    Connect[HTTP -> Conectores]
-    SSE[SSE /agents/run]
+  subgraph Gateway
+    Auth[Auth/Tenant RateLimit Idempotency]
+    Events[PublishEventsRedis]
+    Connect[HTTPtoConectores]
+    SSE[SSEagentsrun]
   end
-  subgraph "BullMQ Workers"
-    Ingest[Ingestão RAG]
-    Recon[Conciliação Pagamento]
-    Auto[Automations/NPS]
+  subgraph Workers
+    Ingest[IngestaoRAG]
+    Recon[ConciliacaoPagamento]
+    Auto[AutomationsNPS]
   end
-  subgraph "Conectores FastAPI"
-    Asaas[Asaas API]
-    Ads[Ads SDKs\nMeta/Google/TikTok]
-    Mail[Email/SMS]
+  subgraph Connectors
+    Asaas[AsaasAPI]
+    Ads[AdsSDKsMetaGoogleTikTok]
+    Mail[EmailSMS]
   end
-  subgraph "Supabase Postgres"
-    RLS[RLS + Policies]
+  subgraph DB
+    RLS[RLSPolicies]
     Vectors[pgvector]
-    Tables[CRM/Agents/Invoices/Events]
+    Tables[CRMAgentsInvoicesEvents]
   end
-  subgraph "Supabase Storage"
-    Buckets[Buckets privados por tenant]
+  subgraph Storage
+    Buckets[BucketsPrivadosTenant]
   end
-  subgraph "Agno Service"
+  subgraph Agno
     Clio[Clio]
     Lucy[Lucy]
     Luddy[Luddy]
@@ -380,9 +380,9 @@ flowchart LR
   Auto --> Clio
   Auto --> Lucy
   Auto --> Luddy
-  Clio -->|/rag/search| Auth
-  Lucy -->|/rag/search| Auth
-  Luddy -->|/rag/search| Auth
+  Clio -->|ragsearch| Auth
+  Lucy -->|ragsearch| Auth
+  Luddy -->|ragsearch| Auth
   Clio --> Auth
   Lucy --> Auth
   Luddy --> Auth
@@ -393,16 +393,16 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-  subgraph "Tríade de Agentes"
-    Clio[Clio\nCriativos/Copy/Persona]
-    Lucy[Lucy\nTráfego/Ads/Métricas]
-    Luddy[Luddy\nSDR/Inbox/Checkout]
+  subgraph Triade
+    Clio[Clio CopyPersona]
+    Lucy[Lucy AdsMetricas]
+    Luddy[Luddy InboxCheckout]
   end
-  RAG[(RAG\nkb_spaces/docs/vectors)]
-  CRM[(CRM/Leads/Deals)]
-  KPIs[(KPIs/Dashboard)]
-  Payments[(Asaas)]
-  Events[Event Bus (Redis)]
+  RAG[RAGkbspacesdocsvectors]
+  CRM[CRMLeadsDeals]
+  KPIs[KPIDashboard]
+  Payments[Asaas]
+  Events[EventBusRedis]
   Clio -- consulta --> RAG
   Luddy -- consulta --> RAG
   Lucy -- consome --> KPIs
@@ -446,16 +446,16 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-  U[Upload /rag/uploads] --> Q[Queue kb_uploads: queued]
-  Q --> P[Worker Parse/OCR/Clean]
-  P --> C[Chunk 700-1200 + overlap]
-  C --> E[Embed 1536-d]
-  E --> V[(kb_vectors)]
-  V -- ">50k" --> IDX{Index?}
-  IDX -- "No" --> SRCH[Search scan]
-  IDX -- "IVFFlat/HNSW" --> SRCH
-  SRCH --> A[Agno (Clio/Luddy)]
-  A --> UI[UI com fontes citadas]
+  U[UploadRAGUploads] --> Q[QueueKbUploadsQueued]
+  Q --> P[WorkerParseOCRCLEAN]
+  P --> C[Chunk7001200Overlap]
+  C --> E[Embed1536d]
+  E --> V[KbVectors]
+  V -- ">50k" --> IDX[Indexado]
+  IDX -- "No" --> SRCH[SearchScan]
+  IDX -- "IVFFlatHNSW" --> SRCH
+  SRCH --> A[AgnoClioLuddy]
+  A --> UI[UIcomFontesCitadas]
 ```
 
 ### 16.5 RLS multi-tenant (conceito)
