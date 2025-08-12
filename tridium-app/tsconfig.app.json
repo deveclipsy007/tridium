@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src", "../tridium_site_i_os_liquid_light.jsx", "../attribution_explorer_budget_co_pilot_i_os_liquid_react.jsx", "../checkout_i_os_liquid_glassmorphism_react_tailwind.jsx", "../integrations_hub_admin_i_os_liquid_react.jsx", "../lucy_dashboard_i_os_liquid_react.jsx", "../luddy_crm_360_i_os_liquid_react.jsx", "../luddy_crm_i_os_liquid_react.jsx"]
+}
